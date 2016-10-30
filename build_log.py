@@ -63,6 +63,13 @@ class BuildLog(object):
                 self._warnings[warning] &= self.OVERRIDDEN
                 self._warning = override.replace(warning)
 
+    def apply_config(self, config):
+        for suppression in config.suppressions():
+            self.suppress(suppression)
+
+        for override in config.overrides():
+            self.override(override)
+
     def populate(self, logpath, comp):
         """ Populate the BuildLog with all the warnings in a given log file
 

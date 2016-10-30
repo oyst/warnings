@@ -24,11 +24,16 @@ def populate(newlog, reflog, compiler_name, confpaths):
     compiler = COMPILERS[compiler_name]
 
     build = BuildLog()
-    build.populate(buildlog, compiler)
-
     ref = BuildLog()
+
+    build.populate(buildlog, compiler)
     if reflog is not None:
         ref.populate(goldenlog, compiler)
+
+    for confpath in confpaths:
+        config = Config.load(confpath)
+        build.apply_config(config)
+        ref.apply_config(config)
 
     return (build, ref)
 
