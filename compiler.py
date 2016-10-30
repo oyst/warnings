@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import re
 
-class VC9:
+class VC9(object):
     name = 'vc9'
     warn = re.compile(r'''^
                       (?:\d+>)?                              # part id
@@ -18,7 +18,7 @@ class VC9:
                       (?P<message>[^\(].+)                   # <message>
                       \s*$''', re.MULTILINE|re.VERBOSE)
 
-class VC14:
+class VC14(object):
     name = 'vc14'
     warn = re.compile(r'''^
                       (?:\d+>)?                              # part id
@@ -35,7 +35,7 @@ class VC14:
                       (?P<message>[^\(].+)                   # <message>
                       \s*$''', re.MULTILINE|re.VERBOSE)
 
-class GCC4:
+class GCC4(object):
     name = 'gcc4'
     warn = re.compile(r'''^
                       (?P<fullpath>
@@ -51,7 +51,7 @@ class GCC4:
                       (?P<code>(\[(-W\S+|enabled \s by \s default)\])?)   # <code>
                       \s*$''', re.MULTILINE|re.VERBOSE)
 
-class Clang:
+class Clang(object):
     name = 'clang'
     warn = re.compile(r'''^
                       (?P<fullpath>
@@ -67,7 +67,7 @@ class Clang:
                       (?P<code>(\[(-W\S+|enabled \s by \s default)\])?)   # <code>
                       \s*$''', re.MULTILINE|re.VERBOSE)
 
-class XLC:
+class XLC(object):
     name = 'xlc'
     warn = re.compile(r'''^
                       "                                                   # "

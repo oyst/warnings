@@ -7,7 +7,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-class BuildLog:
+class BuildLog(object):
     NORMAL = 0
     SUPPRESSED = 1
     OVERRIDE = 2

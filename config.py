@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-class Config:
+class Config(object):
     def __init__(self):
         self._conf = None
 
