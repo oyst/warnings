@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 class BuildLog(object):
     NORMAL = 0
     SUPPRESSED = 1
-    OVERRIDE = 2
+    OVERRIDEN = 2
 
     def __init__(self):
         self._compiler = None
@@ -28,7 +28,13 @@ class BuildLog(object):
         return self._compiler.name()
 
     def warnings(self):
-        return [k for k, v in self._warnings.keys() if v & self.SUPPRESSED == 0]
+        return [k for k, v in self._warnings.keys() if not v & self.SUPPRESSED]
+
+    def suppressed(self):
+        return [k for k, v in self._warnings.keys() if v & self.SUPPRESSED]
+
+    def overridden(self):
+        return [k for k, v in self._warnings.keys() if v & self.OVERRIDEN]
 
     def warning_count(self):
         return len(self.warnings())
