@@ -69,9 +69,9 @@ class RegexWarning(Warning):
         def __eq__(self, other):
             return re.match(self._val, other)
         def __str__(self):
-            return self._val
+            return "/" + self._val + "/"
         def __repr__(self):
-            return self._val
+            return "/" + self._val + "/"
 
     @classmethod
     def from_dict(cls, d):
@@ -80,7 +80,7 @@ class RegexWarning(Warning):
             val = getattr(warning, part)
             try:
                 if val.startswith("/") and val.endswith("/"):
-                    setattr(warning, part, RegexWarning.RegexPart(val))
+                    setattr(warning, part, RegexWarning.RegexPart(val[1:-1]))
             except AttributeError:
                 pass
         return warning
