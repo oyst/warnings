@@ -1,5 +1,7 @@
 #!/usr/bin/env python
-from log import logwarn
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Container for a single warning
 class Warning:
@@ -51,10 +53,10 @@ class Warning:
         warning = cls()
         for key in d:
             if not isinstance(key, str):
-                logwarn("Invalid part {0}".format(key))
+                logger.warning("Invalid part {0}".format(key))
                 continue
             if key not in cls.__parts:
-                logwarn("Unknown part {0}".format(key))
+                logger.warning("Unknown part {0}".format(key))
                 continue
 
             setattr(warning, key, d[key])
