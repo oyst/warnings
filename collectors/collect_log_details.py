@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # == Log info ==
 # build_name
 # build_path

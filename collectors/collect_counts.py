@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # == Counts ==
 # build_warn_count
 # ref_warn_count

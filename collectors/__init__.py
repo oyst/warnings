@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from importlib import import_module
 from os import listdir
 from os.path import dirname
