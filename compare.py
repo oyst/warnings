@@ -6,20 +6,14 @@ import sys, os
 import argparse
 from collections import defaultdict
 import importlib
+from collectors import collectors
 
 COMPILERS = defaultdict(None, {comp.name: comp for comp in compiler.compilers})
 
-def import_collectors(import_path):
-    module = importlib.import_module(import_path)
-    collectors = filter(lambda f: f.startswith("collect_"), dir(module))
-    return collectors
-
-DEFAULT_COLLECTORS = import_collectors("collectors")
-
-def collect_values(build, ref, collectors):
+def collect_values(build, ref, collectors=collectors):
     vals = {}
 
-    for collector in DEFAULT_COLLECTORS + collectors:
+    for collector in collectors:
         vals.update(collector(build, ref))
     return vals
 
@@ -45,18 +39,13 @@ if __name__ == '__main__':
     parser.add_argument("--compiler", "-c", dest="compiler", required=True, choices=[COMPILERS.keys()], help="The (closest) compiler which created the logs")
     parser.add_argument("--config", "-f", dest="config", required=False, nargs="*", help="Optional paths to config files containing overrides and suppressions")
     parser.add_argument("--template", "-t", dest="template", required=True, help="The output template")
-    parser.add_argument("--collector", "-r", dest="collector", required=False, nargs="*", help="Optional paths to collector python scripts containing a list `collectors` of methods")
     parser.add_argument("--output", "-o", dest="output", required=False, default=None, help="The file to output to. Default to stdout")
 
     args = parser.parse_args()
 
     build, ref = main(args.buildlog, args.reflog, args.compiler, args.config)
 
-    collectors = []
-    for path in args.collector:
-        collectors += import_collectors(path)
-
-    vals = collect_values(build, ref, collectors)
+    vals = collect_values(build, ref)
 
     if args.output is None:
         outstream = sys.stdout
