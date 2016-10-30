@@ -17,6 +17,9 @@ class BuildLog:
     def logpath(self):
         return self._logpath
 
+    def logname(self):
+        return os.path.dirname(self._logpath)
+
     def compiler(self):
         return self._compiler.name()
 
