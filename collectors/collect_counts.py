@@ -59,6 +59,7 @@ def collect_counts(build, ref):
             else:
                 shared_warnings.append(warning)
 
+    counts = {}
     counts['build_warn_count'] = len(build_warnings)
     counts['ref_warn_count'] = len(ref_warnings)
     counts['total_warn_count'] = len(all_warnings)

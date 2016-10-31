@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 import logging
+import re
 
 logger = logging.getLogger(__name__)
+
+MatchType = type(re.match("", ""))
 
 # Container for a single warning
 class Warning(object):
@@ -24,10 +27,10 @@ class Warning(object):
             other = self.__class__.from_dict(other)
         if isinstance(other, MatchType):
             other = self.__class__.from_match(other)
-        if not isinstance(self.__class__, other):
+        if not isinstance(other, self.__class__):
             return False
 
-        for part, include in self._parts:
+        for part, include in self._parts.items():
             if not include:
                 continue
             other_part = getattr(other, part)

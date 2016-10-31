@@ -22,19 +22,23 @@ class BuildLog(object):
         return self._logpath
 
     def logname(self):
-        return os.path.dirname(self._logpath)
+        if self._logpath is not None:
+            return os.path.dirname(self._logpath)
+        return self._logpath
 
     def compiler(self):
-        return self._compiler.name()
+        if self._compiler is not None:
+            return self._compiler.name
+        return None
 
     def warnings(self):
-        return [k for k, v in self._warnings.keys() if not v & self.SUPPRESSED]
+        return [k for k, v in self._warnings.items() if not v & self.SUPPRESSED]
 
     def suppressed(self):
-        return [k for k, v in self._warnings.keys() if v & self.SUPPRESSED]
+        return [k for k, v in self._warnings.items() if v & self.SUPPRESSED]
 
     def overridden(self):
-        return [k for k, v in self._warnings.keys() if v & self.OVERRIDEN]
+        return [k for k, v in self._warnings.items() if v & self.OVERRIDEN]
 
     def warning_count(self):
         return len(self.warnings())
@@ -87,7 +91,7 @@ class BuildLog(object):
         # Reinitialise
         self._compiler = comp
         self._logpath = logpath
-        self._warning_pattern = comp.warning_pattern()
+        self._warning_pattern = comp.warn
         self._warnings = {}
 
         # Load in the log text
