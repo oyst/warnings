@@ -8,31 +8,31 @@
 # removed_warn_count
 # shared_warn_count
 def collect_counts(build, ref):
-    build_warnings = build.warnings()
-    ref_warnings = ref.warnings()
+    build_warnings = build.warnings
+    ref_warnings = ref.warnings
     all_warnings = []
     introduced_warnings = []
     removed_warnings = []
     shared_warnings = []
 
-    for warning in build.warnings():
-        build_count = build.count_of_warning(warning)
-        ref_count = ref.count_of_warning(warning)
+    for warning in build_warnings:
+        build_count = build_warnings.count(warning)
+        ref_count = ref_warnings.count(warning)
         if ref_count == build_count:
             all_warnings.append(warning)
         elif build_count > ref_count:
             all_warnings.append(warning)
 
     # Don't add the warning if there are equal amounts in both since we have already done it above
-    for warning in ref.warnings():
-        build_count = build.count_of_warning(warning)
-        ref_count = ref.count_of_warning(warning)
+    for warning in ref.warnings:
+        build_count = build_warnings.count(warning)
+        ref_count = ref_warnings.count(warning)
         if ref_count > build_count:
             all_warnings.append(warning)
 
     for warning in all_warnings:
-        build_count = build.count_of_warning(warning)
-        ref_count = ref.count_of_warning(warning)
+        build_count = build_warnings.count(warning)
+        ref_count = ref_warnings.count(warning)
         # None in the reference, so it must be introduced
         if ref_count == 0:
             introduced_warnings.append(warning)

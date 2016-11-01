@@ -67,10 +67,10 @@ class BuildLog(object):
                 override.override(warning)
 
     def apply_config(self, config):
-        for suppression in config.suppressions():
+        for suppression in config.suppressions:
             self.suppress(suppression)
 
-        for override in config.overrides():
+        for override in config.overrides:
             self.override(override)
 
     @classmethod

@@ -26,15 +26,14 @@ def render(vals, template):
 def populate(buildlog, reflog, compiler_name, confpaths):
     compiler = COMPILERS[compiler_name]
 
-    build = BuildLog()
-    ref = BuildLog()
-
-    build.populate(buildlog, compiler)
+    build = BuildLog.from_file(buildlog, compiler)
     if reflog is not None:
-        ref.populate(goldenlog, compiler)
+        ref = BuildLog.from_file(reflog, compiler)
+    else:
+        ref = BuildLog()
 
     for confpath in confpaths:
-        config = Config.load(confpath)
+        config = Config.from_file(confpath)
         build.apply_config(config)
         ref.apply_config(config)
 

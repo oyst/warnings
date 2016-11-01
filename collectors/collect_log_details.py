@@ -8,10 +8,8 @@
 # ref_path
 # ref_name
 def collect_log_details(build, ref):
-    details = {'build_name': build.logname(),
-               'build_path': build.logpath(),
-               'build_compiler': build.compiler(),
-               'ref_name': ref.logname(),
-               'ref_path': ref.logpath(),
-               'ref_compiler': ref.compiler(),}
+    details = {'build_name': build.name,
+               'build_compiler': build.compiler,
+               'ref_name': ref.name,
+               'ref_compiler': ref.compiler,}
     return details
