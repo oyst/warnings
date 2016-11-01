@@ -1,5 +1,8 @@
 #!/usr/bin/env python
+import yaml
 from collections import defaultdict
+from suppression import Suppression
+from override import Override
 
 class Config(object):
     SUPPRESS = 'suppress'
@@ -21,7 +24,7 @@ class Config(object):
     @classmethod
     def from_file(cls, confpath):
         with open(confpath, 'r') as f:
-            loaded = defaultdict([], yaml.load(f))
+            loaded = defaultdict(list, yaml.load(f))
         return cls.from_dict(loaded)
 
     @classmethod
