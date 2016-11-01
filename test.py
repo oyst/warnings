@@ -4,6 +4,9 @@ import sys, re, os
 
 from logcompare import *
 
+test_dir = os.path.join("tests")
+testlog_dir = os.path.join("tests", "test_logs")
+
 class SimpleCompiler(object):
     name = "simpleCompiler"
     warn = re.compile(r'''^
@@ -161,6 +164,24 @@ class TestBuildWarningComparison(unittest.TestCase):
         self.assertFalse(w1 <= w2)
         self.assertFalse(w1 > w2)
         self.assertFalse(w1 < w2)
+
+class TestCompare(unittest.TestCase):
+    class TestCase(object):
+        def __init__(self, name, buildlog=None, reflog=None, template=None, output=None, configs=None):
+            self.buildlog = os.path.join(testlog_dir, "empty.log") if buildlog is None else buildlog
+            self.reflog = os.path.join(testlog_dir, "empty.log") if reflog is None else reflog
+            self.configs = [] if configs is None else configs
+            self.template = os.path.join(testlog_dir, "empty.log") if template is None else template
+            self.output = os.path.join(testlog_dir, "empty.log") if output is None else output
+            self.name = name
+
+    def test_end_to_end(self):
+        for testcase in self.testcases:
+            build, ref = populate(testcase.buildlog, testcase.reflog, SimpleCompiler, testcase.configs)
+            vals = collect_values(build, ref)
+            template = open(testcase.template, "r").read()
+            output = render(vals, template)
+            self.assertEqual(testcase.output, output, "EndToEnd test {0} failed to match the expected output".format(testcase.name))
 
 if __name__ == "__main__":
     unittest.main()
