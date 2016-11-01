@@ -11,33 +11,59 @@ class Warning(object):
     # Each warning is made up of these fields
     # The boolean for each field is whether the field contributes to equality
     _parts = {'fullpath': True,
-               'filepath': True,
-               'filename': True,
-               'function': True,
-               'code': True,
-               'message': True,
-               'linenum': False,}
+              'filepath': True,
+              'filename': True,
+              'function': True,
+              'code': True,
+              'message': True,
+              'linenum': False,}
+
+    def _eq_parts(self):
+        return [k for k, v in self._parts.items() if v]
 
     def __init__(self):
         for part in self._parts:
             self.__dict__[part] = None
 
     def __eq__(self, other):
-        if isinstance(other, dict):
-            other = self.__class__.from_dict(other)
-        if isinstance(other, MatchType):
-            other = self.__class__.from_match(other)
-        if not isinstance(other, self.__class__):
-            return False
-
-        for part, include in self._parts.items():
-            if not include:
-                continue
+        """ Two warnings are equal if their parts are equal. """
+        for part in self._eq_parts():
             other_part = getattr(other, part)
             self_part = getattr(self, part)
             if other_part != self_part:
                 return False
         return True
+
+    def __ne__(self, other):
+        return not self == other
+
+    def __ge__(self, other):
+        """ everything in self is in other """
+        for part in self._eq_parts():
+            other_part = getattr(other, part)
+            self_part = getattr(self, part)
+            if self_part is None:
+                continue
+            if other_part != self_part:
+                return False
+        return True
+
+    def __le__(self, other):
+        """ everything in other is in self """
+        for part in self._eq_parts():
+            other_part = getattr(other, part)
+            self_part = getattr(self, part)
+            if other_part is None:
+                continue
+            if other_part != self_part:
+                return False
+        return True
+
+    def __lt__(self, other):
+        return self != other and self <= other
+
+    def __gt__(self, other):
+        return self != other and self >= other
 
     def __str__(self):
         output = []

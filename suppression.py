@@ -4,4 +4,4 @@ import re
 
 class Suppression(RegexWarning):
     def suppresses(self, warning):
-        return self == warning
+        return self >= warning

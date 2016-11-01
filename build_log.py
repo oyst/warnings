@@ -10,62 +10,61 @@ logger = logging.getLogger(__name__)
 class BuildLog(object):
     NORMAL = 0
     SUPPRESSED = 1
-    OVERRIDEN = 2
+    OVERRIDDEN = 2
 
     def __init__(self):
+        self._name = None
         self._compiler = None
-        self._logpath = None
-        self._warning_pattern = None
         self._warnings = {}
 
-    def logpath(self):
-        return self._logpath
+    @property
+    def name(self):
+        return self._name
 
-    def logname(self):
-        if self._logpath is not None:
-            return os.path.dirname(self._logpath)
-        return self._logpath
-
+    @property
     def compiler(self):
         if self._compiler is not None:
             return self._compiler.name
         return None
 
+    @property
     def warnings(self):
         return [k for k, v in self._warnings.items() if not v & self.SUPPRESSED]
 
+    @property
     def suppressed(self):
         return [k for k, v in self._warnings.items() if v & self.SUPPRESSED]
 
+    @property
     def overridden(self):
-        return [k for k, v in self._warnings.items() if v & self.OVERRIDEN]
+        return [k for k, v in self._warnings.items() if v & self.OVERRIDDEN]
 
     def warning_count(self):
-        return len(self.warnings())
+        return len(self.warnings)
 
     def has_warning(self, warning):
-        return warning in self.warnings()
+        return warning in self.warnings
 
     def __contains__(self, item):
         return self.has_warning(item)
 
     def count_of_warning(self, warning):
         count = 0
-        for my_warning in self.warnings():
+        for my_warning in self.warnings:
             if my_warning == warning:
                 count += 1
         return count
 
     def suppress(self, suppression):
-        for warning in self.warnings():
+        for warning in self.warnings:
             if suppression.suppresses(warning):
-                self._warnings[warning] &= self.SUPPRESSED
+                self._warnings[warning] |= self.SUPPRESSED
 
     def override(self, override):
-        for warning in self.warnings():
+        for warning in self.warnings:
             if override.overrides(warning):
-                self._warnings[warning] &= self.OVERRIDDEN
-                self._warning = override.replace(warning)
+                self._warnings[warning] |= self.OVERRIDDEN
+                override.override(warning)
 
     def apply_config(self, config):
         for suppression in config.suppressions():
@@ -74,37 +73,26 @@ class BuildLog(object):
         for override in config.overrides():
             self.override(override)
 
-    def populate(self, logpath, comp):
-        """ Populate the BuildLog with all the warnings in a given log file
+    @classmethod
+    def from_file(cls, logfile, comp):
+        with open(logfile) as f:
+            self = cls.from_string(f.read(), comp)
+        self._name = os.path.basename(logfile)
+        return self
 
-            Parameters
-              logpath  : path to the build log to be parsed
-              comp : compiler which best matches the one which produced the log
-
-            Returns
-              0 : successfully read and populated the BuildLog
-              1 : failed to populate the BuildLog
-
-            Raises
-              TypeError, ValueError, IOError
-        """
-        # Reinitialise
+    @classmethod
+    def from_string(cls, string, comp):
+        pattern = comp.warn
+        warnings = []
+        for match in pattern.finditer(string):
+            # Handle the match
+            warnings.append(Warning.from_match(match))
+        self = cls.from_warnings(warnings)
         self._compiler = comp
-        self._logpath = logpath
-        self._warning_pattern = comp.warn
-        self._warnings = {}
+        return self
 
-        # Load in the log text
-        with open(self._logpath, 'r') as logfile:
-            logtext = logfile.read()
-        if not logtext:
-            logger.warning("Log {0} is empty".format(self._logpath))
-            return 1
-
-        if self._warning_pattern:
-            for match in self._warning_pattern.finditer(logtext):
-                # Handle the match
-                warning = Warning.from_match(match)
-                self._warnings[warning] = self.NORMAL
-
-        return 0
+    @classmethod
+    def from_warnings(cls, warnings):
+        self = cls()
+        self._warnings = {warning: self.NORMAL for warning in warnings}
+        return self
