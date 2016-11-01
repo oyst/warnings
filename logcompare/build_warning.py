@@ -28,8 +28,8 @@ class BuildWarning(object):
     def __eq__(self, other):
         """ Two warnings are equal if their parts are equal. """
         for part in self._eq_parts():
-            other_part = getattr(other, part)
-            self_part = getattr(self, part)
+            other_part = getattr(other, part, None)
+            self_part = getattr(self, part, None)
             if other_part != self_part:
                 return False
         return True
@@ -40,8 +40,8 @@ class BuildWarning(object):
     def __ge__(self, other):
         """ everything in self is in other """
         for part in self._eq_parts():
-            other_part = getattr(other, part)
-            self_part = getattr(self, part)
+            other_part = getattr(other, part, None)
+            self_part = getattr(self, part, None)
             if self_part is None:
                 continue
             if other_part != self_part:
@@ -51,8 +51,8 @@ class BuildWarning(object):
     def __le__(self, other):
         """ everything in other is in self """
         for part in self._eq_parts():
-            other_part = getattr(other, part)
-            self_part = getattr(self, part)
+            other_part = getattr(other, part, None)
+            self_part = getattr(self, part, None)
             if other_part is None:
                 continue
             if other_part != self_part:
@@ -101,6 +101,9 @@ class RegexBuildWarning(BuildWarning):
             return "/" + self._val + "/"
         def __repr__(self):
             return "/" + self._val + "/"
+
+    def register_part(self, name, equality=False):
+        self._parts[name] = equality
 
     @classmethod
     def from_dict(cls, d):

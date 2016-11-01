@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-
 from templite import Templite
 
 from build_warning import BuildWarning
