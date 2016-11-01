@@ -175,13 +175,17 @@ class TestCompare(unittest.TestCase):
             self.output = os.path.join(testlog_dir, "empty.log") if output is None else output
             self.name = name
 
+    testcases = [
+    ]
+
     def test_end_to_end(self):
         for testcase in self.testcases:
             build, ref = populate(testcase.buildlog, testcase.reflog, SimpleCompiler, testcase.configs)
             vals = collect_values(build, ref)
             template = open(testcase.template, "r").read()
-            output = render(vals, template)
-            self.assertEqual(testcase.output, output, "EndToEnd test {0} failed to match the expected output".format(testcase.name))
+            actual = render(vals, template)
+            expected = open(testcase.output, "r").read()
+            self.assertEqual(expected, actual, "TestCase {0} failed to match the expected output".format(testcase.name))
 
 if __name__ == "__main__":
     unittest.main()
