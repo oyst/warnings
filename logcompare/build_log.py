@@ -2,7 +2,7 @@
 
 import os
 import compiler
-from warning import Warning
+from build_warning import BuildWarning
 import logging
 
 logger = logging.getLogger(__name__)
@@ -86,7 +86,7 @@ class BuildLog(object):
         warnings = []
         for match in pattern.finditer(string):
             # Handle the match
-            warnings.append(Warning.from_match(match))
+            warnings.append(BuildWarning.from_match(match))
         self = cls.from_warnings(warnings)
         self._compiler = comp
         return self

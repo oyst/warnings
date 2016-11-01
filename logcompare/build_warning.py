@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 MatchType = type(re.match("", ""))
 
 # Container for a single warning
-class Warning(object):
+class BuildWarning(object):
     # Each warning is made up of these fields
     # The boolean for each field is whether the field contributes to equality
     _parts = {'fullpath': True,
@@ -91,7 +91,7 @@ class Warning(object):
             setattr(warning, key, d[key])
         return warning
 
-class RegexWarning(Warning):
+class RegexBuildWarning(BuildWarning):
     class RegexPart:
         def __init__(self, val):
             self._val = val
@@ -104,12 +104,12 @@ class RegexWarning(Warning):
 
     @classmethod
     def from_dict(cls, d):
-        warning = super(RegexWarning, cls).from_dict(d)
+        warning = super(RegexBuildWarning, cls).from_dict(d)
         for part in warning._parts:
             val = getattr(warning, part)
             try:
                 if val.startswith("/") and val.endswith("/"):
-                    setattr(warning, part, RegexWarning.RegexPart(val[1:-1]))
+                    setattr(warning, part, RegexBuildWarning.RegexPart(val[1:-1]))
             except AttributeError:
                 pass
         return warning

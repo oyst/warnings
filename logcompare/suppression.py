@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-from warning import RegexWarning
+from build_warning import RegexBuildWarning
 import re
 
-class Suppression(RegexWarning):
+class Suppression(RegexBuildWarning):
     def suppresses(self, warning):
         return self >= warning

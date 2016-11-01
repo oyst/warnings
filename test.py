@@ -1,17 +1,38 @@
+#! /usr/bin/env python
 import unittest
 import sys, re, os
-sys.path.append("..")
 
-from warning import Warning
-from build_log import BuildLog
-from override import Override
-from suppression import Suppression
+from logcompare import *
 
-from setup_test import *
+class SimpleCompiler(object):
+    name = "simpleCompiler"
+    warn = re.compile(r'''^
+                      (?P<fullpath>
+                       (?P<filepath>.+/)?                   # <filepath>
+                       (?P<filename>.+)                     # <filename>
+                      )\s*
+                      \(                                     # (
+                       (?P<linenum>\d+)                      # <linenum>
+                      \)\s*                                  # )
+                      (?P<code>C\d+?)                        # <code>
+                      :\s*                                   # :
+                      (?P<message>.+)                        # <message>
+                      $''', re.MULTILINE|re.VERBOSE)
+
+def warn_to_str(warning):
+    return "{w.fullpath}({w.linenum}){w.code}:{w.message}".format(w=warning)
+
+def str_to_warn(string):
+    return BuildWarning.from_match(re.match(SimpleCompiler.warn, string))
 
 test_warnings = [
     str_to_warn("file1.c(10)C123:warning1"),
     str_to_warn("path/to/file2.c(20)C45:warning2"),
+]
+
+compare_test_warnings = [
+    str_to_warn("file3.c(30)C55:warning3"),
+    str_to_warn("file3.c(30)C55:warning3"),
 ]
 
 override_test_warnings = test_warnings[:]
@@ -30,7 +51,7 @@ class TestBuildLog(unittest.TestCase):
         self.assertEqual(log.warning_count(), 0)
 
     def test_populate_from_warnings(self):
-        """ Test the population of build logs from a list of Warnings """
+        """ Test the population of build logs from a list of BuildWarnings """
         log = BuildLog.from_warnings(test_warnings)
         self.assertIsNone(log.name)
         self.assertIsNone(log.compiler)
@@ -103,6 +124,43 @@ class TestBuildLog(unittest.TestCase):
             self.assertIn(warning, test_warnings)
 
         self.assertEqual(log.warning_count(), 0)
+
+class TestBuildWarningComparison(unittest.TestCase):
+    def test_eq(self):
+        """ Test equality and gt, lt of two warnings """
+        w1 = compare_test_warnings[0]
+        w2 = compare_test_warnings[1]
+
+        self.assertTrue(w1 == w2)
+        self.assertFalse(w1 != w2)
+        self.assertTrue(w1 >= w2)
+        self.assertTrue(w1 <= w2)
+        self.assertFalse(w1 < w2)
+        self.assertFalse(w1 > w2)
+
+    def test_ne(self):
+        """ Test the inequality and gt, lt comparison of two warnings """
+        w1 = compare_test_warnings[0]
+        w2 = compare_test_warnings[1]
+
+        # BuildWarning 2 is the most specific, so BuildWarning 1 is greater
+        w1.filename = None
+        self.assertFalse(w1 == w2)
+        self.assertTrue(w1 != w2)
+        self.assertTrue(w1 >= w2)
+        self.assertFalse(w1 <= w2)
+        self.assertTrue(w1 > w2)
+        self.assertFalse(w1 < w2)
+
+        # Both BuildWarning 1 and BuildWarning 2 are missing parts from each other, so neither
+        # are greater
+        w2.code = None
+        self.assertFalse(w1 == w2)
+        self.assertTrue(w1 != w2)
+        self.assertFalse(w1 >= w2)
+        self.assertFalse(w1 <= w2)
+        self.assertFalse(w1 > w2)
+        self.assertFalse(w1 < w2)
 
 if __name__ == "__main__":
     unittest.main()
