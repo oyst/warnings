@@ -10,22 +10,27 @@ class Config(object):
         self._overrides = []
         self._suppressions = []
 
+    @property
     def suppressions(self):
         return self._suppressions
 
+    @property
     def overrides(self):
         return self._overrides
 
     @classmethod
-    def load(cls, confpath):
-        conf = cls()
+    def from_file(cls, confpath):
         with open(confpath, 'r') as f:
             loaded = defaultdict([], yaml.load(f))
+        return cls.from_dict(loaded)
 
-        for supp in loaded[cls.SUPPRESS]:
+    @classmethod
+    def from_dict(cls, d):
+        conf = cls()
+        for supp in d[cls.SUPPRESS]:
             conf._suppressions.append(Suppression.from_dict(supp))
 
-        for over in loaded[cls.OVERRIDE]:
+        for over in d[cls.OVERRIDE]:
             conf._overrides.append(Override.from_dict(over))
 
         return conf
